@@ -11,8 +11,8 @@
     <description>Helper for running yeti source files form the classpath and shell script execution.</description>
     <inceptionYear>2011</inceptionYear>
     <organization>
-        <name>yeti</name>
-        <url>http://mth.github.com/yeti/</url>
+        <name>chrisichris</name>
+        <url>http://github.com/chrisichris</url>
     </organization>
 
     <licenses>
@@ -23,7 +23,6 @@
         </license>
     </licenses>
 
-    <!--
   <scm>
     <connection>scm:git:git://github.com/chrisichris/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:chrisichris/${project.artifactId}.git</developerConnection>
@@ -41,7 +40,7 @@
       <archive>http://groups.google.com/group/yeti-lang</archive>
       <post>http://groups.google.com/group/yeti-lang</post>
     </mailingList>
-  </mailingLists> -->
+  </mailingLists> 
 
     <developers>
         <developer>
@@ -57,6 +56,20 @@
     </contributor>
   </contributors>
 -->
+
+    <distributionManagement>
+        <repository>
+            <id>chrisis-local-releases</id>
+            <name>Maven2 local repository for git clone releases</name>
+            <url>file:///${basedir}/../../chrisis-maven-repo/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>chrisis-local-snapshots</id>
+            <name>Maven2 local repository for git clone snapshots</name>
+            <url>file:///${basedir}/../../chrisis-maven-repo/snapshots/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <encoding>UTF-8</encoding>
