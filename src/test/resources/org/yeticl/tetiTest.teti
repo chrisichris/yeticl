@@ -1,0 +1,11 @@
+module org.yeticl.tetiTest;
+
+import java.lang.StringBuffer;
+
+stB = new StringBuffer();
+
+write str = (stB#append("\(str)"); ());
+
+%>Hier kommt Kurt.<%
+
+stB#toString();

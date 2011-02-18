@@ -1,0 +1,11 @@
+module org.yeticl.endWithDoneTest;
+
+import java.lang.StringBuffer;
+
+do stBi:
+
+    stB is ~StringBuffer = stBi;
+
+    write str = (stB#append("\(str)"); ());
+
+%>Does end with done?
