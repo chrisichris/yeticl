@@ -45,7 +45,7 @@ var _sourceDirs = map' string (list (wrapArray YetiShellUtils#getShellSourceDirs
 
 shellEvaluator = YetiShellUtils#getShellEvaluator();
 _output str = print str;
-cprint str = (_output (str ^ "\nyeti>"); ());
+cprint str = (_output (str ^ "\n"); ());
 sprint str = _output str;
 
 
@@ -115,9 +115,6 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
     ),
 
 
-    cprint,
-    sprint,
-
     addMonitor name monitor = synchronized timer \(
         monitorId := monitorId + 1;
         monitors := {id = monitorId, var active = true, name, monitor} :: monitors;
@@ -184,9 +181,10 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
         lineReader =
             if YetiShellUtils#USE_JLINE then
                 cReader = new jline.ConsoleReader(System#in, new OutputStreamWriter(System#out));
-                \(string cReader#readLine(">"))
+                \(string cReader#readLine("yeti>"))
             else
-                stdin.readln;
+                \(println "yeti>";
+                  stdin.readln ());
             fi;
 
 

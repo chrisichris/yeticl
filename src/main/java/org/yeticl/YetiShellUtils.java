@@ -27,6 +27,14 @@ import yeti.lang.Fun;
 public class YetiShellUtils {
 
     public static boolean USE_JLINE = false;
+    static {
+        try{
+            YetiShellUtils.class.getClassLoader().loadClass("jline.ConsoleReader");
+            USE_JLINE = true;
+        }catch(Exception x){
+            USE_JLINE = false;
+        }
+    }
 
     static public Object moduleLoad(ClassLoader classLoader,String moduleName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         classLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
@@ -68,10 +76,7 @@ public class YetiShellUtils {
     static public Object evalWithResult(String yetiCode) {
         YetiClassLoader cl = new YetiClassLoader(null,null);
         YetiEvaluator ye = new YetiEvaluator(cl);
-        System.out.println(ye.eval("import org.yeticl.YetiShellUtils;"));
         yetiCode = "result = ("+yetiCode+")";
-        System.out.println(yetiCode);
-        System.out.println(ye.eval(yetiCode));
         ye.eval("YetiShellUtils#setEvalResult(result);");
         return EVAL_RESULT.get();
     }

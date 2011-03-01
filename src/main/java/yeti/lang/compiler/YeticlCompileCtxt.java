@@ -77,7 +77,6 @@ public class YeticlCompileCtxt {
             return (String) f2.apply(new IntNum(0));
         }catch(CompileException ex){
             //ex.printStackTrace();;
-            System.out.println("Error compiling:"+ex.getMessage());
             return "Error compiling:" + ex.getMessage();
         }finally{
             CompileCtx.currentCompileCtx.set(oldC);
