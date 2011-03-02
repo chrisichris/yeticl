@@ -126,6 +126,15 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
         cprint "removed monitor \(id)";
     ),
 
+    runMonitor id = synchronized timer \(
+        for monitors do mon:
+            if mon.id == id then
+                _ = mon.monitor();
+                ();
+            fi;
+        done;
+    ),
+
     activateMonitor id active = synchronized timer \(
         for monitors do mon:
             if mon.id == id then
