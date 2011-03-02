@@ -19,6 +19,7 @@ package org.yeticl;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import yeti.lang.Fun;
+import yeti.lang.compiler.CompileException;
 
 /**
  *
@@ -73,12 +74,22 @@ public class YetiShellUtils {
         EVAL_RESULT.set(value);
     }
 
+    private static final Object EVAL_EXCEPTION_MARKER = new Object(){public String id(){return "foo";}};
+
     static public Object evalWithResult(String yetiCode) {
         YetiClassLoader cl = new YetiClassLoader(null,null);
         YetiEvaluator ye = new YetiEvaluator(cl);
-        yetiCode = "result = ("+yetiCode+")";
-        ye.eval("YetiShellUtils#setEvalResult(result);");
-        return EVAL_RESULT.get();
+
+        EVAL_RESULT.set(EVAL_EXCEPTION_MARKER);
+        ye.eval("import org.yeticl.YetiShellUtils;");
+        yetiCode = "YetiShellUtils#setEvalResult(("+yetiCode+"))";
+        String rs = ye.eval(yetiCode);
+
+        Object ret = EVAL_RESULT.get();
+        if(ret == EVAL_EXCEPTION_MARKER) 
+            throw new CompileException(1,1,rs == null ? "there was no result": rs.toString());
+        else
+            return ret;
     }
 
 

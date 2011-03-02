@@ -17,14 +17,15 @@
 package org.yeticl;
 
 import junit.framework.TestCase;
+import yeti.lang.compiler.CompileException;
 
 /**
  *
  * @author Christian
  */
-public class YetiClassLoaderTest extends TestCase {
+public class YetiShellUtilsTest extends TestCase {
     
-    public YetiClassLoaderTest(String testName) {
+    public YetiShellUtilsTest(String testName) {
         super(testName);
     }
 
@@ -39,34 +40,31 @@ public class YetiClassLoaderTest extends TestCase {
     }
 
 
-    /**
-     * Test of loadClass method, of class YeitClassLoader.
-     */
-    public void testLoadClassError() throws Exception {
+
+    public void testModuleValue() throws Exception {
         YetiClassLoader ycl = new YetiClassLoader(null, null);
+        Object r = YetiShellUtils.moduleLoad(ycl,"org.yeticl.test");
+        assertEquals("test",r);
+    }
+
+
+    public void testEvalWithResultOk() throws Exception {
+        Object r = YetiShellUtils.evalWithResult("3 + 2 - 4");
+        assertEquals(1,((Number) r).intValue());
+
+        r = YetiShellUtils.evalWithResult("x = 'dort';x");
+        assertEquals("dort",r.toString());
+    }
+
+    public void testEvalWithResultNotOk() throws Exception {
         try{
-            ycl.loadClass("org.foo.foo");
-            fail();
-        }catch(Exception ex) {}
-    }
-    
-    public void testLoadClassCompile() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null, null);
-        Class cl = ycl.loadClass("org.yeticl.test");
-        assertNotNull(cl);
-    }
+            YetiShellUtils.evalWithResult("this is an error");
+            fail("an excpetion should be thrown");
 
+        }catch(CompileException ex) {
 
-    public void testThreadClassLoader() throws Exception {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        assertNotNull(cl.loadClass("yeti.lang.compiler.repl"));
+        }
     }
-
-    public void testYetiLoadClass() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null, null);
-        assertNotNull(ycl.loadClass("yeti.lang.compiler.repl"));
-    }
-
 
 
 }

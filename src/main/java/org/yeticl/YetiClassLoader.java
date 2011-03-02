@@ -127,12 +127,12 @@ public class YetiClassLoader extends ClassLoader implements CodeWriter {
         YeticlCompileCtxt compileCtx = new YeticlCompileCtxt(pathSources, this, new String[]{"yeti/lang/std", "yeti/lang/io"});
         try {
             compileCtx.compile(name, 0);
-        }catch (CompileException ex){
+        }catch (YeticlCompileException ex){
             throw ex;
         } catch (RuntimeException ex){
             throw ex;
         }catch (Exception ex) {
-            throw new CompileException(ex);
+            throw new YeticlCompileException(ex);
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
         }
