@@ -78,9 +78,9 @@ checkChanged dirs lastupdate is list<~File> -> number -> number= (
                 lastUpdate := nlu;
                 ae = synchronized timer \monitors;
                 if not empty? ae then
-                    s = cprint "monitor: " ^ (_sourceDirs);
                     for ae do a:
                         if synchronized timer \(a.active) then
+                            _ = cprint "monitor: \(a.name)";
                             a.monitor()
                         fi
                     done;
@@ -167,13 +167,12 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
 
     brancheWithDirs srcDirs  code = (
         testEvaluator = newEvaluator srcDirs;
-        cprint ("-----------------------\nbranche start: " ^ code);
+        cprint ("-----------------------branche start: ");
         if (strLength code) > 0 then
-            sprint (code ^ "\n");
             res = testEvaluator#eval(code);
             sprint (res ^ "\n");
         fi;
-        cprint ("branche end: " ^ code ^ "\n------------------------");
+        cprint ("branche end ------------------------");
     ),
 
     branche code = brancheWithDirs (_sourceDirs) code,
