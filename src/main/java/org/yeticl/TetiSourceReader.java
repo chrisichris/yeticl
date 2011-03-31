@@ -65,11 +65,6 @@ abstract class TetiSourceReader implements SourceReader {
     abstract protected char[] getSourceImpl(String[] name_, boolean fullPath) throws Exception;
 
     static public char[] parseHeti(String name,char[] chars) {
-        /*
-        String moduleName = newName.replace('/', '.');
-        StringBuilder stb = new StringBuilder(chars.length + 300);
-        stb.append("module ").append(moduleName).append(";");
-        stb.append("do args ctxt writer: write s is string -> () =(writer s;()); ");*/
         StringBuilder stb = new StringBuilder((int)(chars.length + 1024));
         
         //rawCode (text code)*
@@ -103,15 +98,18 @@ abstract class TetiSourceReader implements SourceReader {
         if(chars[i] == '=') {
             //expression
             i = i +1;
-            i = readExpressionCode(stb, chars, i);
+            i = readExpressionCode('e',stb, chars, i);
+        }else if(chars.length > (i + 1) && chars[i+1] == '=' && Character.isLetter(chars[i])) {
+            i = i + 2;
+            i = readExpressionCode(chars[i],stb, chars, i);
         }else{
             i = readRawCode(stb,chars,i);
         }
         return i;
     }
 
-    static private int readExpressionCode(StringBuilder stb, char[] chars, int i) {
-        stb.append("write (string (");
+    static private int readExpressionCode(char writerLetter,StringBuilder stb, char[] chars, int i) {
+        stb.append("writers.").append(writerLetter).append("(string (");
         i = readRawCode(stb,chars,i);
         stb.append("));");
         return i;
@@ -143,7 +141,7 @@ abstract class TetiSourceReader implements SourceReader {
 
 
     static private int readString(StringBuilder stb, char[] chars, int i) {
-        stb.append("write('");
+        stb.append("writers.u ('");
         i = readRawString(stb,chars,i);
         stb.append("');");
         return i;
