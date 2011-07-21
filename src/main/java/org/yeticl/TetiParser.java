@@ -1,72 +1,20 @@
 /*
- * Copyright 2011 Christian Essl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions
- * and limitations under the License.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package org.yeticl;
-
-import java.io.IOException;
-import yeti.lang.compiler.SourceReader;
-
 
 /**
  *
  * @author Christian
  */
-abstract class TetiSourceReader implements SourceReader {
+public class TetiParser {
 
-    public static final String TETI_EXT = ".teti";
-
-    public char[] getSource(String[] name_, boolean fullPath) throws Exception {
-        //return getSourceImpl(name_,fullPath);
-        String name = name_[0];
-        try {
-            if(name.endsWith(TETI_EXT)) {
-                name_[0] = name.substring(0,name.length() - 5) + ".yeti";
-                return tryLoadTeti(name,fullPath,null);
-            }else {
-                char[] r = getSourceImpl(name_, fullPath);
-                return r;
-            }
-        }catch (IOException ex){
-
-            if(name.endsWith(".yeti")) {
-                return tryLoadTeti(name,fullPath,ex);
-            }else
-                throw ex;
-        }
-    }
-
-    private char[] tryLoadTeti(String name,boolean fullPath, Exception ex) throws Exception {
-        String[] newName = new String[] {name.substring(0,name.length() - 5) + TETI_EXT};
-        try{
-            char[] chars = getSourceImpl(newName, fullPath);
-            char[] ret = parseHeti(newName[0],chars);
-            return ret;
-        }catch (IOException ex2) {
-            if(ex == null)
-                throw ex2;
-            throw ex;
-        }
-
-    }
-
-    abstract protected char[] getSourceImpl(String[] name_, boolean fullPath) throws Exception;
-
-    static public char[] parseHeti(String name,char[] chars) {
+    static public String parseTeti(String name,String text) {
+        char[] chars = text.toCharArray();
         StringBuilder stb = new StringBuilder((int)(chars.length + 1024));
-        
+
         //rawCode (text code)*
         int i = 0;
         //a potetnial skip initial code marker
@@ -84,17 +32,17 @@ abstract class TetiSourceReader implements SourceReader {
                 stb.append(" done;");
             }
         }
-            
-        
+
+
         if(!"false".equals(System.getProperty("org.yeticl.print-teti","false"))) {
             System.out.println("TETI:  "+name+ "modified code:");
             System.out.println(stb.toString());
         }
-        return stb.toString().toCharArray();
+        return stb.toString().toString();
     }
 
-    static private int readCode(StringBuilder stb, char[] chars, int i) {
-        
+     static private int readCode(StringBuilder stb, char[] chars, int i) {
+
         if(chars[i] == '=') {
             //expression
             i = i +1;
@@ -172,5 +120,4 @@ abstract class TetiSourceReader implements SourceReader {
         }
         return i;
     }
-
 }

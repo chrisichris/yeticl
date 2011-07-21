@@ -1,0 +1,48 @@
+/// put module documentation here
+
+module org.yeticl.shellenviroment;
+
+import java.lang: Thread, ClassLoader;
+
+yclm = load org.yeticl.yeticlassloadermodule;
+eval = load yeti.lang.compiler.eval;
+
+withClassLoader ncl fn is ~ClassLoader -> 'a -> 'b =
+    (oc = Thread#currentThread()#getContextClassLoader();
+    Thread#currentThread()#setContextClassLoader(ncl);
+    try fn () finally Thread#currentThread()#setContextClassLoader(oc) yrt);
+
+
+
+
+{
+var shellEnviroment = eval.evaluateYetiCode [][],
+var shellSourceDirs = [],
+var shellClassLoader = () as ~ClassLoader,
+var useJLine = try Thread#currentThread()#getContextClassLoader()#loadClass("jline.ConsoleReader"); true
+                catch Exception: false yrt,
+
+
+shellEvaluateLoop parentClassLoader sourceDirs commands is ~ClassLoader -> list<string> -> list<string> -> string =
+    (str = withClassLoader parentClassLoader \(
+        se = eval.evaluateYetiCode [SourceReader (yclm.sourceReader sourceDirs true parentClassLoader)] [Bind ()];
+        shellEnviroment := do code: withClassLoader parentClassLoader \(se code) done;
+        shellSourceDirs := sourceDirs;
+        shellClassLoader := parentClassLoader;
+
+        _ = shellEnviroment "s = load org.yeticl.shell";
+        println "----------------------------------------";
+        println "Welcome to yeti-shell, enter -h for help";
+        println "----------------------------------------";
+        for commands do cmd:
+                println "init-command: \(cmd)";
+                println (shellEnviroment cmd).str;
+            done;
+
+        ret = shellEnviroment "(load org.yeticl.shellLoop) ()";
+        ret.str);
+
+    if strStarts? str '"restart"' then
+        shellEvaluateLoop parentClassLoader sourceDirs commands
+    else "quitted" fi),
+}

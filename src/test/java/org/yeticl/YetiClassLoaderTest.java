@@ -38,12 +38,16 @@ public class YetiClassLoaderTest extends TestCase {
         super.tearDown();
     }
 
+    public ClassLoader mkClassLoader() {
+        return TetiLoaderTest.yetiClassLoader(null, null, true);
+    }
+
 
     /**
      * Test of loadClass method, of class YeitClassLoader.
      */
     public void testLoadClassError() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null, null);
+        ClassLoader ycl = mkClassLoader();
         try{
             ycl.loadClass("org.foo.foo");
             fail();
@@ -51,7 +55,7 @@ public class YetiClassLoaderTest extends TestCase {
     }
     
     public void testLoadClassCompile() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null, null);
+        ClassLoader ycl = mkClassLoader();
         Class cl = ycl.loadClass("org.yeticl.test");
         assertNotNull(cl);
     }
@@ -63,7 +67,7 @@ public class YetiClassLoaderTest extends TestCase {
     }
 
     public void testYetiLoadClass() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null, null);
+        ClassLoader ycl = mkClassLoader();
         assertNotNull(ycl.loadClass("yeti.lang.compiler.repl"));
     }
 

@@ -39,32 +39,18 @@ public class YetiShellUtilsTest extends TestCase {
         super.tearDown();
     }
 
+    public ClassLoader mkClassLoader() {
+        return TetiLoaderTest.yetiClassLoader(null, null, true);
+    }
 
-
+    
     public void testModuleValue() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null, null);
+        ClassLoader ycl = mkClassLoader();
         Object r = YetiShellUtils.moduleLoad(ycl,"org.yeticl.test");
         assertEquals("test",r);
     }
 
 
-    public void testEvalWithResultOk() throws Exception {
-        Object r = YetiShellUtils.evalWithResult("3 + 2 - 4");
-        assertEquals(1,((Number) r).intValue());
-
-        r = YetiShellUtils.evalWithResult("x = 'dort';x");
-        assertEquals("dort",r.toString());
-    }
-
-    public void testEvalWithResultNotOk() throws Exception {
-        try{
-            YetiShellUtils.evalWithResult("this is an error");
-            fail("an excpetion should be thrown");
-
-        }catch(CompileException ex) {
-
-        }
-    }
-
+ 
 
 }

@@ -16,6 +16,7 @@
 package org.yeticl;
 
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import junit.framework.TestCase;
 
 /**
@@ -38,22 +39,36 @@ public class TetiLoaderTest extends TestCase {
         super.tearDown();
     }
 
+    static ClassLoader yetiClassLoader(ClassLoader parentNullable, String[] sourceDirsNullable, boolean useClassPath) {
+        try {
+            ClassLoader parent = parentNullable == null ? Thread.currentThread().getContextClassLoader() : parentNullable;
+            String[] sourceDirs = sourceDirsNullable == null ? new String[]{} : sourceDirsNullable;
+            Class cl = Thread.currentThread().getContextClassLoader().loadClass("org.yeticl.YetiClassLoader");
+            Constructor c = cl.getConstructor(ClassLoader.class, String[].class, Boolean.TYPE);
+            return (ClassLoader) c.newInstance(parent, sourceDirs, useClassPath);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
+    public ClassLoader mkClassLoader() {
+        return yetiClassLoader(null, null, true);
+    }
  
     public void testLoadTetiTest() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null,null);
+        ClassLoader ycl = mkClassLoader();
         String r = YetiShellUtils.moduleLoad(ycl, "org.yeticl.tetiTest").toString();
         assertEquals("Hier kommt Kurt.",r.trim());
     }
 
     public void testLoadFootTetiTest() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null,null);
+        ClassLoader ycl = mkClassLoader();
         YetiShellUtils.moduleLoad(ycl, "org.yeticl.footeti").toString();
     }
 
 
     public void testEndWithDoneTetiTest() throws Exception {
-        YetiClassLoader ycl = new YetiClassLoader(null,null);
+        ClassLoader ycl = mkClassLoader();
         StringBuffer stB = new StringBuffer();
         YetiShellUtils.moduleRun(ycl, "org.yeticl.endWithDoneTest", stB);
         assertEquals("Does end with done?",stB.toString().trim());

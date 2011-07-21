@@ -15,12 +15,14 @@
  */
 
 module org.yeticl.shell;
+
 import java.lang: System, Thread;
 import java.io: OutputStreamWriter,File;
-import java.util.Timer;
+import java.util:Timer,TimerTask;
 
-
-
+yclm = load org.yeticl.yeticlassloadermodule;
+sem = load org.yeticl.shellenviroment;
+eval = load yeti.lang.compiler.eval;
 
 
 
@@ -39,11 +41,10 @@ _findOneDir nameList = (
 );
 
 
-var _sourceDirs = map' string (list (wrapArray YetiShellUtils#getShellSourceDirs()));
+var _sourceDirs = sem.shellSourceDirs;
 
 
 
-shellEvaluator = YetiShellUtils#getShellEvaluator();
 _output str = print str;
 cprint str = (_output (str ^ "\n"); ());
 sprint str = _output str;
@@ -68,7 +69,7 @@ checkChanged dirs lastupdate is list<~File> -> number -> number= (
 
 
 (
-    class MyTimerTask() extends YTimerTask()
+    class MyTimerTask() extends TimerTask()
         var dirs = map' do d: new File(string d) done _sourceDirs,
         var lastUpdate = checkChanged dirs 0,
         void run() (
@@ -94,16 +95,23 @@ checkChanged dirs lastupdate is list<~File> -> number -> number= (
 );
 
 
-newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
-    sds = new FileSourceReader(array sourceFiles);
-    newCl = new YetiClassLoader(shellEvaluator#getYetiClassLoader()#getParent(),sds);
-    new YetiEvaluator(newCl);
+newEvaluator sourceFiles = (
+    ocl = Thread#currentThread()#getContextClassLoader();
+    Thread#currentThread()#setContextClassLoader(sem.shellClassLoader);
+    el = try eval.evaluateYetiCode [SourceReader (yclm.sourceReader sourceFiles true sem.shellClassLoader)] [Bind ()];
+         finally Thread#currentThread()#setContextClassLoader(ocl) yrt;
+    do code:
+        ocl = Thread#currentThread()#getContextClassLoader();
+        Thread#currentThread()#setContextClassLoader(sem.shellClassLoader);
+        try el code;
+        finally Thread#currentThread()#setContextClassLoader(ocl) yrt;
+    done;
 );
 
 
 
 {
-
+    cprint, sprint,
     set sourceDirs o = _sourceDirs := o;,
     get sourceDirs () = _sourceDirs,
 
@@ -151,16 +159,16 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
         cprint "";
     ),
 
-    shellEvaluator,
+    get shellEnviroment () = sem.shellEnviroment,
 
-    var replEvaluator is ~YetiEvaluator = newEvaluator (_sourceDirs),
+    var replEnviroment  = newEvaluator (_sourceDirs),
 
     var refreshCode = "",
 
     refresh () = (
-        replEvaluator := newEvaluator (_sourceDirs);
+        replEnviroment := newEvaluator (_sourceDirs);
         if (strLength refreshCode) > 0 then
-            cprint replEvaluator#eval(refreshCode)
+            cprint (replEnviroment refreshCode).str;
         fi;
         cprint "repl refreshed"
     ),
@@ -169,8 +177,8 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
         testEvaluator = newEvaluator srcDirs;
         cprint ("-----------------------branche start: ");
         if (strLength code) > 0 then
-            res = testEvaluator#eval(code);
-            sprint (res ^ "\n");
+            res = testEvaluator code;
+            sprint (res.str ^ "\n");
         fi;
         cprint ("branche end ------------------------");
     ),
@@ -182,44 +190,5 @@ newEvaluator sourceFiles is list<string> -> ~YetiEvaluator = (
         branche "(load org.yeb.yebspec).printResult print ((load \(moduleName)) none)",
     */
 
-    _start _ = (
-        x = refresh ();
-
-        cprint "\nReady to take your commands :)";
-        lineReader =
-            if YetiShellUtils#USE_JLINE then
-                cReader = new jline.ConsoleReader(System#in, new OutputStreamWriter(System#out));
-                \(string cReader#readLine("yeti>"))
-            else
-                \(println "yeti>";
-                  stdin.readln ());
-            fi;
-
-
-        var continue = true;
-        var ret = "quit";
-
-        continue loop (
-
-            line = lineReader ();
-            if line == "--quit" then
-                continue := false;
-                ret := "quit";
-                sprint "\nQuitting shell. By By!\n";
-            elif line == "--restart" then
-                continue := false;
-                ret := "restart";
-                sprint "\nRestarting shell. See you soon :)\n";
-            elif line == "--help" or line == "-h" or line == "-help" then
-                cprint "--restart : reloads the shell\n--quit : to stop the shell\n--help : this message \n-yeti expr : execute yeti expr in shell\n-s : shell commands struct \nyeti expr : execute yeti expr in repl";
-            elif strStarts? line "-" then
-                nline = strRight line 1;
-                sprint "\nshell:";
-                cprint shellEvaluator#eval(nline);
-            else
-                cprint replEvaluator#eval(line);
-            fi;
-        );
-        ret
-    ),
+ 
 }
