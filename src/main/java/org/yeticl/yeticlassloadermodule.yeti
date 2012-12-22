@@ -35,6 +35,13 @@ parseTeti src fileName =
         (avoid ((not) . defined?) . (++ ['']) . tail)
         id
         src;
+    //skip everything till first code
+    tokens = find (=="<?") tokens; 
+    tokens = if empty? tokens then
+            []
+        else
+            tail tokens
+        fi;
     
     compile inCode endToken tokens result =
         case tokens of
@@ -72,9 +79,8 @@ parseTeti src fileName =
            (result = endToken :: result;
             strJoin "" (reverse result));
         esac;
-    ret = "module \(moduleName); load org.yeb.mvc.viewutils; load org.yeb.std; do data ctxt: ctxt.echo ('" 
-        ^ (compile false "');" tokens []) 
-        ^ "; Completed ''; done;";
+    ret = "module \(moduleName);" 
+        ^ (compile true "" tokens []);
     //println ret;
     ret);
 

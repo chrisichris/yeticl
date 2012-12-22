@@ -1,4 +1,4 @@
-module org.yeticl.endWithDoneTest;
+<?
 
 import java.lang.StringBuffer;
 
@@ -7,6 +7,7 @@ do stBi:
     stB is ~StringBuffer = stBi;
 
     write str = (stB#append("\(str)"); ());
-    writers = { e = write, u = write};
+    ctxt = { print = write, echo = write};
 
-%>Does end with done?
+?>Does end with done?<?
+done
