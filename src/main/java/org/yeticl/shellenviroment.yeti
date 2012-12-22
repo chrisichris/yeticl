@@ -33,14 +33,26 @@ withClassLoader ncl fn is ~ClassLoader -> 'a -> 'b =
 var shellEnviroment = eval.evaluateYetiCode [][],
 var shellSourceDirs = [],
 var shellClassLoader = () as ~ClassLoader,
-var useJLine = try Thread#currentThread()#getContextClassLoader()#loadClass("jline.ConsoleReader"); true
-                catch Exception: false yrt,
+var useJLine = try 
+        Thread#currentThread()#getContextClassLoader()
+            #loadClass("jline.ConsoleReader"); true
+    catch Exception: 
+        false 
+    yrt,
 
 
-shellEvaluateLoop parentClassLoader sourceDirs commands is ~ClassLoader -> list<string> -> list<string> -> string =
-    (str = withClassLoader parentClassLoader \(
-        se = eval.evaluateYetiCode [SourceReader (yclm.sourceReader sourceDirs true parentClassLoader)] [Bind ()];
-        shellEnviroment := do code: withClassLoader parentClassLoader \(se code) done;
+shellEvaluateLoop parentClassLoader sourceDirs commands 
+    is ~ClassLoader -> list<string> -> list<string> -> string =
+    (str = withClassLoader parentClassLoader 
+        \(se = eval.evaluateYetiCode 
+               [SourceReader (yclm.sourceReader 
+                                    sourceDirs 
+                                    true 
+                                    (Some parentClassLoader))] 
+                [Bind ()];
+        shellEnviroment := do code: 
+            withClassLoader parentClassLoader \(se code) 
+        done;
         shellSourceDirs := sourceDirs;
         shellClassLoader := parentClassLoader;
 
@@ -58,5 +70,7 @@ shellEvaluateLoop parentClassLoader sourceDirs commands is ~ClassLoader -> list<
 
     if strStarts? str '"restart"' then
         shellEvaluateLoop parentClassLoader sourceDirs commands
-    else "quitted" fi),
+    else 
+        "quitted" 
+    fi),
 }

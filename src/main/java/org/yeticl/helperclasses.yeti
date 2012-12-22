@@ -16,32 +16,66 @@
 
 module org.yeticl.helperclasses;
 
-import java.lang:Thread, ClassLoader, Throwable;
-import yeti.lang.compiler: CompileException, YetiEval;
+import java.lang:Thread, 
+                 ClassLoader, 
+                 Throwable;
+import yeti.lang.compiler: CompileException, 
+                        YetiEval;
 
 yclm = load org.yeticl.yeticlassloadermodule;
 sem = load org.yeticl.shellenviroment;
 evalm = load yeti.lang.compiler.eval;
 
 class YetiCompileHelper
-    void compileAll(String[] classPath, String[] sourceDirs, boolean srcFromClassPath, String[] sourceFiles, String destDir)
-       evalm.compileYetiFiles [To destDir,
-                         SourceReader (yclm.sourceReader
-                            if nullptr? sourceDirs then [] else map string (wrapArray sourceDirs) fi
-                            srcFromClassPath Thread#currentThread()#getContextClassLoader()),
-                         ClassPath if nullptr? classPath then [] else map string (wrapArray classPath) fi]
-                         []
-                         (map string (wrapArray sourceFiles));
+    void compileAll(String[] classPath, 
+                    String[] sourceDirs, 
+                    boolean srcFromClassPath, 
+                    String[] sourceFiles, 
+                    String destDir)
+       sourceReader = 
+            yclm.sourceReader
+                if nullptr? sourceDirs then 
+                    [] 
+                else 
+                    map string (wrapArray sourceDirs) 
+                fi
+                srcFromClassPath 
+                (Some Thread#currentThread()#getContextClassLoader());
+       evalm.compileYetiFiles 
+            [To destDir,
+            SourceReader sourceReader,
+            ClassPath if nullptr? classPath then 
+                        [] 
+                    else 
+                        map string classPath 
+                    fi]
+            []
+            (map string sourceFiles);
         (),
 
-    void htmlDocAll(String[] classPath, String[] sourceDirs, boolean srcFromClassPath, String[] sourceFiles, String docDir)
+    void htmlDocAll(String[] classPath, 
+                    String[] sourceDirs, 
+                    boolean srcFromClassPath, 
+                    String[] sourceFiles, 
+                    String docDir)
         types = array [];
-        evalm.compileYetiFiles [SourceReader (yclm.sourceReader
-                                    if nullptr? sourceDirs then [] else map string (wrapArray sourceDirs) fi
-                                    srcFromClassPath Thread#currentThread()#getContextClassLoader()),
-                         ClassPath if nullptr? classPath then [] else map string (wrapArray classPath) fi]
-                         [Type (push types)]
-                         (map string (wrapArray sourceFiles));
+        sourceReader = 
+            yclm.sourceReader
+                if nullptr? sourceDirs then 
+                    [] 
+                else 
+                    map string (wrapArray sourceDirs) 
+                fi
+                srcFromClassPath 
+                (Some Thread#currentThread()#getContextClassLoader());
+        evalm.compileYetiFiles 
+            [SourceReader sourceReader,
+            ClassPath if nullptr? classPath then 
+                        [] 
+                    else map string (wrapArray classPath) 
+            fi]
+            [Type (push types)]
+            (map string (wrapArray sourceFiles));
         if not empty? types then
             ctx = evalm.evaluateYetiCode [ICast ()];
             case ctx [Bind (), Source 'doc.yeti', Exec (array [docDir])]
@@ -56,10 +90,20 @@ class YetiCompileHelper
         fi;
         (),
 
-    void shellEvaluateLoop(ClassLoader parentClassLoader, String[] sourceDirs, String[] commands)
+    void shellEvaluateLoop(ClassLoader parentClassLoader, 
+                        String[] sourceDirs, 
+                        String[] commands)
         _ = sem.shellEvaluateLoop parentClassLoader
-                          if nullptr? sourceDirs then [] else map string (wrapArray sourceDirs) fi
-                          if nullptr? commands then [] else map string (wrapArray commands) fi;
+            if nullptr? sourceDirs then 
+                [] 
+            else 
+                map string (wrapArray sourceDirs) 
+            fi
+            if nullptr? commands then 
+                [] 
+            else 
+                map string (wrapArray commands) 
+            fi;
         (),
 
     Object evaluate(String code)

@@ -4,7 +4,7 @@
     <groupId>org.yeti</groupId>
     <artifactId>yeticl</artifactId>
     <packaging>jar</packaging>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <url>http://github.com/chrisichris/${project.artifactId}/</url>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.yeti</groupId>
             <artifactId>yeti</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.9.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -145,7 +145,7 @@
                     <dependency>
                         <groupId>org.yeti</groupId>
                         <artifactId>yeti</artifactId>
-                        <version>0.1-SNAPSHOT</version>
+                        <version>0.9.7-SNAPSHOT</version>
                     </dependency>
 
                 </dependencies>
