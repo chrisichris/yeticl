@@ -76,18 +76,9 @@ class YetiCompileHelper
             fi]
             [Type (push types)]
             (map string (wrapArray sourceFiles));
-        if not empty? types then
-            ctx = evalm.evaluateYetiCode [ICast ()];
-            case ctx [Bind (), Source 'doc.yeti', Exec (array [docDir])]
-                     ((inputHandle classOf YetiEval#getClassLoader()
-                                   #getResourceAsStream('doc.yeti')
-                                   'UTF-8').contents()) of
-                {result = Result obj}:
-                    for types (obj is ~Object unsafely_as 'a);
-                {str}:
-                    println str
-            esac;
-        fi;
+        evalm.generateYetiDoc {directory = string docDir, 
+                                modules = types, 
+                                error = failWith};
         (),
 
     void shellEvaluateLoop(ClassLoader parentClassLoader, 
